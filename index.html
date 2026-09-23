@@ -644,9 +644,8 @@ body.locked{overflow:hidden}
 </div>
 <script>
 (function(){
-  // === НАСТРОЙКА ОТПРАВКИ В TELEGRAM ===
-  var TG_TOKEN='8993645645:AAGU4iqGNwiobC2hnZfQDNtDJfIr6dvYCoI';
-  var TG_CHAT='1115903031';
+  // === ПРИЁМНИК АНКЕТ (Google Apps Script: таблица + Телеграм) ===
+  var GS_URL='https://script.google.com/macros/s/AKfycbwDqpozF3OI0pCVxfpr6hX_rYOXJ3GcsLZ1XzztmXmu9WpEaO5ia9xplhMetEGtsf2Uiw/exec';
 
   var form=document.getElementById('form');
   form.addEventListener('submit',function(e){
@@ -680,16 +679,16 @@ body.locked{overflow:hidden}
         doCopy(text,false);
       }
     }
-    if(TG_TOKEN&&TG_CHAT){
-      fetch('https://api.telegram.org/bot'+TG_TOKEN+'/sendMessage',{
-        method:'POST',
-        headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({chat_id:TG_CHAT,text:'💌 '+text})
-      }).then(function(r){if(!r.ok)throw new Error('bad status');showDone(true)})
-        .catch(function(){sbtn.disabled=false;sbtn.textContent='Отправить ответ';showDone(false)});
-    } else {
-      showDone(false);
-    }
+    fetch(GS_URL,{
+      method:'POST',
+      mode:'no-cors',
+      headers:{'Content-Type':'application/x-www-form-urlencoded'},
+      body:'name='+encodeURIComponent(name)
+        +'&attend='+encodeURIComponent(attend.value)
+        +'&phone='+encodeURIComponent(phone)
+        +'&wish='+encodeURIComponent(wish)
+    }).then(function(){showDone(true)})
+      .catch(function(){sbtn.disabled=false;sbtn.textContent='Отправить ответ';showDone(false)});
   });
   document.getElementById('name').addEventListener('input',function(){document.getElementById('err-name').classList.remove('show')});
   var ph=document.getElementById('phone');
